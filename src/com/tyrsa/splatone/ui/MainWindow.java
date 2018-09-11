@@ -3,6 +3,7 @@ package com.tyrsa.splatone.ui;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.io.File;
+import java.io.IOException;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -10,6 +11,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.JSplitPane;
 import javax.swing.JTree;
 import javax.swing.UIManager;
+import javax.print.attribute.standard.JobMessageFromOperator;
 import javax.swing.BoxLayout;
 import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
@@ -17,6 +19,8 @@ import javax.swing.JInternalFrame;
 import javax.swing.JDesktopPane;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
 import java.awt.Color;
 import javax.swing.tree.DefaultTreeModel;
 
@@ -118,7 +122,15 @@ public class MainWindow extends JFrame {
 		JButton btnNewButton_1 = new JButton("\u0417\u0430\u043F\u0443\u0441\u043A");
 		btnNewButton_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				AsyncReader.run(initPath);
+				try {
+					AsyncReader.run(initPath);
+				} catch (IOException e) {
+					JOptionPane.showMessageDialog(null, "Ошибка при чтении файла", "ОШИБКА", JOptionPane.ERROR_MESSAGE);
+					e.printStackTrace();
+				} catch (InterruptedException e) {
+					JOptionPane.showMessageDialog(null, "Ошибка при работе с потоком", "ОШИБКА", JOptionPane.ERROR_MESSAGE);
+					e.printStackTrace();
+				}
 			}
 		});
 		btnNewButton_1.setBounds(280, 79, 97, 25);

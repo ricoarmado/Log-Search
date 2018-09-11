@@ -1,4 +1,6 @@
 package com.tyrsa.splatone.model;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousFileChannel;
@@ -14,9 +16,9 @@ import java.util.concurrent.TimeUnit;
 public class AsyncReader {
 
 	public static void read(String path) throws IOException, InterruptedException {
-	    ExecutorService pool = new ScheduledThreadPoolExecutor(3);
+		ExecutorService pool = new ScheduledThreadPoolExecutor(3);
 	    AsynchronousFileChannel fileChannel = AsynchronousFileChannel.open(
-	        Paths.get(path), EnumSet.of(StandardOpenOption.READ),
+	    Paths.get(path), EnumSet.of(StandardOpenOption.READ),
 	        pool);
 	    CompletionHandler<Integer, ByteBuffer> handler = new CompletionHandler<Integer, ByteBuffer>() {
 	      @Override
@@ -38,13 +40,31 @@ public class AsyncReader {
 	    pool.awaitTermination(1, TimeUnit.SECONDS);
 	    for (ByteBuffer byteBuffer : buffers) {
 	      for (int i = 0; i < byteBuffer.limit(); i++) {
-	        System.out.print((char) byteBuffer.get(i));
+	    	  System.out.print((char) byteBuffer.get(i));
 	      }
 	    }
 	}
 	
-	public static void run(String path) {
-		
+	public static void run(String path) throws IOException, InterruptedException {
+		File currentDir = new File(path);
+		if(currentDir == null && !currentDir.isDirectory()) {
+			throw new FileNotFoundException();
+		}
+		else {
+			traversal(currentDir);
+		}
+	}
+	
+	public static void traversal(File currentDir) throws IOException, InterruptedException {
+		File[] dirFiles = currentDir.listFiles();
+		for(File current : dirFiles) {
+			if(current.isDirectory()) {
+				traversal(current);
+			}
+			else {
+				read(current.getAbsolutePath());
+			}
+		}
 	}
 
 }

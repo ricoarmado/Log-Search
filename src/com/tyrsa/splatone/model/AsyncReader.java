@@ -38,6 +38,7 @@ public class AsyncReader {
 	      fileChannel.read(buffers[i], i * 10, buffers[i], handler);
 	    }
 	    pool.awaitTermination(1, TimeUnit.SECONDS);
+	    
 	    for (ByteBuffer byteBuffer : buffers) {
 	      for (int i = 0; i < byteBuffer.limit(); i++) {
 	    	  System.out.print((char) byteBuffer.get(i));

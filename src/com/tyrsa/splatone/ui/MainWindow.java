@@ -1,6 +1,5 @@
 package com.tyrsa.splatone.ui;
 
-import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.io.File;
 import java.io.IOException;
@@ -8,14 +7,9 @@ import java.io.IOException;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-import javax.swing.JSplitPane;
 import javax.swing.JTree;
 import javax.swing.UIManager;
-import javax.print.attribute.standard.JobMessageFromOperator;
 import javax.swing.BoxLayout;
-import javax.swing.JTabbedPane;
-import javax.swing.JToolBar;
-import javax.swing.JInternalFrame;
 import javax.swing.JDesktopPane;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
@@ -29,19 +23,18 @@ import com.tyrsa.splatone.model.AsyncReader;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.JTextField;
 import javax.swing.JButton;
-import javax.swing.border.BevelBorder;
 import javax.swing.border.LineBorder;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileSystemView;
-import javax.swing.JTextPane;
 import javax.swing.JTextArea;
-import java.awt.SystemColor;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
 public class MainWindow extends JFrame {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JTextField pathTextField;
 	private String initPath;
@@ -90,6 +83,10 @@ public class MainWindow extends JFrame {
 		tree.setBorder(new LineBorder(new Color(0, 0, 0)));
 		tree.setModel(new DefaultTreeModel(
 			new DefaultMutableTreeNode("Root") {
+				/**
+				 * 
+				 */
+				private static final long serialVersionUID = 1L;
 				{
 				}
 			}

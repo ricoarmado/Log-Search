@@ -8,6 +8,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.BoxLayout;
 import javax.swing.JDesktopPane;
@@ -17,8 +18,13 @@ import javax.swing.JOptionPane;
 
 import java.awt.Color;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreePath;
 
 import com.tyrsa.splatone.model.AsyncReader;
+import com.tyrsa.splatone.model.FileAsyncArrayList;
+import com.tyrsa.splatone.model.FileContainer;
+import com.tyrsa.splatone.model.WriteToUIInterface;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.JTextField;
@@ -100,11 +106,12 @@ public class MainWindow extends JFrame {
 		
 		pathTextField = new JTextField();
 		pathTextField.setEditable(false);
-		pathTextField.setText("C:\\");
+		//pathTextField.setText("C:\\files\\");
 		pathTextField.setBounds(12, 42, 256, 22);
 		desktopPane.add(pathTextField);
 		pathTextField.setColumns(10);
 		pathTextField.setText(initPath);
+		
 		
 		JButton selectButton = new JButton("\u0412\u044B\u0431\u0440\u0430\u0442\u044C");
 		selectButton.setBounds(280, 41, 97, 25);
@@ -125,7 +132,30 @@ public class MainWindow extends JFrame {
 		btnNewButton_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
-					AsyncReader.run(initPath);
+					String lex = inputtextField.getText();
+					String type = typetextField.getText();
+					AsyncReader.run(initPath,lex,type,(container) -> {
+						FileAsyncArrayList.getInstance().add(container);
+						SwingUtilities.invokeLater(new Runnable() {
+							
+							@Override
+							public void run() {
+								DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
+							      DefaultMutableTreeNode root = (DefaultMutableTreeNode) tree.getModel()
+							          .getRoot();
+							      
+							      
+							      
+							      
+							      DefaultMutableTreeNode child = new DefaultMutableTreeNode(container.getFile());
+							      model.insertNodeInto(child, root, root.getChildCount());
+							      
+							      //tree.scrollPathToVisible(new TreePath(child.getPath()));
+								
+								
+							}
+						});
+					});
 				} catch (IOException e) {
 					JOptionPane.showMessageDialog(null, "Ошибка при чтении файла", "ОШИБКА", JOptionPane.ERROR_MESSAGE);
 					e.printStackTrace();
@@ -147,6 +177,7 @@ public class MainWindow extends JFrame {
 		desktopPane.add(label_1);
 		
 		inputtextField = new JTextField();
+		inputtextField.setText("123");
 		inputtextField.setBounds(12, 99, 256, 22);
 		desktopPane.add(inputtextField);
 		inputtextField.setColumns(10);
@@ -160,7 +191,7 @@ public class MainWindow extends JFrame {
 		desktopPane.add(label_3);
 		
 		typetextField = new JTextField();
-		typetextField.setText(".log");
+		typetextField.setText(".txt");
 		typetextField.setColumns(10);
 		typetextField.setBounds(12, 150, 256, 22);
 		desktopPane.add(typetextField);

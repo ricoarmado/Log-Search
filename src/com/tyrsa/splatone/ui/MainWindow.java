@@ -28,6 +28,7 @@ import javax.swing.filechooser.FileSystemView;
 import javax.swing.JTextArea;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import javax.swing.JTabbedPane;
 
 public class MainWindow extends JFrame {
 
@@ -38,6 +39,8 @@ public class MainWindow extends JFrame {
 	private JPanel contentPane;
 	private JTextField pathTextField;
 	private String initPath;
+	private JTextField inputtextField;
+	private JTextField typetextField;
 
 	/**
 	 * Launch the application.
@@ -60,12 +63,13 @@ public class MainWindow extends JFrame {
 	 * Create the frame.
 	 */
 	public MainWindow() {
+		setTitle("Splat Task One");
 		initPath = FileSystemView.getFileSystemView().getHomeDirectory().getAbsolutePath();
 		
 	
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 900, 550);
+		setBounds(100, 100, 929, 698);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -76,7 +80,7 @@ public class MainWindow extends JFrame {
 		contentPane.add(desktopPane);
 		
 		JLabel lblNewLabel = new JLabel("\u041A\u043E\u0440\u043D\u0435\u0432\u043E\u0439 \u043A\u0430\u0442\u0430\u043B\u043E\u0433");
-		lblNewLabel.setBounds(12, 13, 167, 16);
+		lblNewLabel.setBounds(12, 23, 167, 16);
 		desktopPane.add(lblNewLabel);
 		
 		JTree tree = new JTree();
@@ -91,7 +95,7 @@ public class MainWindow extends JFrame {
 				}
 			}
 		));
-		tree.setBounds(12, 136, 256, 344);
+		tree.setBounds(12, 224, 359, 373);
 		desktopPane.add(tree);
 		
 		pathTextField = new JTextField();
@@ -107,8 +111,9 @@ public class MainWindow extends JFrame {
 		desktopPane.add(selectButton);
 		selectButton.addActionListener((event) -> {
 			JFileChooser jfc = new JFileChooser(initPath);
+			jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 			int returnValue = jfc.showOpenDialog(null);
-
+			
 			if (returnValue == JFileChooser.APPROVE_OPTION) {
 				File selectedFile = jfc.getSelectedFile();
 				initPath = selectedFile.getAbsolutePath();
@@ -130,17 +135,53 @@ public class MainWindow extends JFrame {
 				}
 			}
 		});
-		btnNewButton_1.setBounds(280, 79, 97, 25);
+		btnNewButton_1.setBounds(280, 98, 97, 25);
 		desktopPane.add(btnNewButton_1);
 		
-		JLabel label = new JLabel("\u041D\u0430\u0439\u0434\u0435\u043D\u043D\u044B\u0439 \u0442\u0435\u0441\u0442");
-		label.setBounds(12, 107, 167, 16);
+		JLabel label = new JLabel("\u041D\u0430\u0439\u0434\u0435\u043D\u043E \u0432 \u0444\u0430\u0439\u043B\u0430\u0445");
+		label.setBounds(12, 195, 167, 16);
 		desktopPane.add(label);
 		
-		JTextArea textArea = new JTextArea();
-		textArea.setBackground(UIManager.getColor("Button.background"));
-		textArea.setWrapStyleWord(true);
-		textArea.setBounds(553, 47, 307, 326);
-		desktopPane.add(textArea);
+		JLabel label_1 = new JLabel("\u0412\u0445\u043E\u0434\u043D\u0430\u044F \u043B\u0435\u043A\u0441\u0435\u043C\u0430");
+		label_1.setBounds(12, 83, 167, 16);
+		desktopPane.add(label_1);
+		
+		inputtextField = new JTextField();
+		inputtextField.setBounds(12, 99, 256, 22);
+		desktopPane.add(inputtextField);
+		inputtextField.setColumns(10);
+		
+		JLabel label_2 = new JLabel("\u0421\u043E\u0434\u0435\u0440\u0436\u0438\u043C\u043E\u0435 \u0444\u0430\u0439\u043B\u0430");
+		label_2.setBounds(473, 23, 307, 16);
+		desktopPane.add(label_2);
+		
+		JLabel label_3 = new JLabel("\u0422\u0438\u043F \u0444\u0430\u0439\u043B\u0430\r\n");
+		label_3.setBounds(12, 134, 167, 16);
+		desktopPane.add(label_3);
+		
+		typetextField = new JTextField();
+		typetextField.setText(".log");
+		typetextField.setColumns(10);
+		typetextField.setBounds(12, 150, 256, 22);
+		desktopPane.add(typetextField);
+		
+		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		tabbedPane.setBounds(473, 42, 416, 517);
+		desktopPane.add(tabbedPane);
+		
+		JButton button = new JButton("<<");
+		button.setEnabled(false);
+		button.setBounds(473, 572, 97, 25);
+		desktopPane.add(button);
+		
+		JButton button_1 = new JButton(">>");
+		button_1.setEnabled(false);
+		button_1.setBounds(582, 572, 97, 25);
+		desktopPane.add(button_1);
+		
+		JButton button_2 = new JButton("\u0412\u044B\u0431\u0440\u0430\u0442\u044C \u0432\u0441\u0435");
+		button_2.setEnabled(false);
+		button_2.setBounds(691, 572, 198, 25);
+		desktopPane.add(button_2);
 	}
 }

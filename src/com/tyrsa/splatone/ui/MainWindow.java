@@ -46,6 +46,7 @@ public class MainWindow extends JFrame {
 	private JTextField pathTextField;
 	private String initPath;
 	private String type;
+	private String lex;
 	private JTextField inputtextField;
 	private JTextField typetextField;
 	private JTree tree;
@@ -156,8 +157,7 @@ public class MainWindow extends JFrame {
 						}
 						list.remove(0);
 						Tree result = treeRoot.search(list);
-						tabbedPane.addTab(result.getNode().getName(), new CustomPane(result)); 
-						JOptionPane.showMessageDialog(null, "", "реяр", JOptionPane.OK_OPTION);
+						tabbedPane.addTab(result.getNode().getName(), new CustomPane(result, lex)); 
 					}
 				}
 			}
@@ -192,7 +192,7 @@ public class MainWindow extends JFrame {
 		btnNewButton_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
-					String lex = inputtextField.getText();
+					lex = inputtextField.getText();
 					type = typetextField.getText();
 					AsyncReader.run(initPath,lex,type,(root) -> {
 						SwingUtilities.invokeLater(new Runnable() {

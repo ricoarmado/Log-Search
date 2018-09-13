@@ -52,9 +52,7 @@ public class AsyncReader {
 	    	Tree chain = new Tree(null);
 	    	chain.setText(result);
 	    	chain.setNode(new File(path));
-	    	chain.setParent(node);
 	    	node.addNode(chain);
-	    	//out.write(new FileContainer(new File(path), result));
 	    	return true;
 	    }
 	    return false;
@@ -62,33 +60,43 @@ public class AsyncReader {
 	
 	public static void run(String path, String lex, String type, WriteToUIInterface out) throws IOException, InterruptedException {
 		File currentDir = new File(path);
-		Tree root;
+		Tree root = null;
 		if(currentDir == null && !currentDir.isDirectory()) {
 			throw new FileNotFoundException();
 		}
 		else {
-			root = new Tree(currentDir);
 			Tree chain = new Tree(currentDir);
-			traversal(currentDir, lex, type, root, root);
-			
+			traversal(currentDir, lex, type, chain);
+			 root = chain;
 		}
+		out.write(root);
 	}
 	
-	public static void traversal(File currentDir, String lex, String type, Tree node, Tree root) throws IOException, InterruptedException {
+	public static void traversal(File currentDir, String lex, String type, Tree node) throws IOException, InterruptedException {
 		File[] dirFiles = currentDir.listFiles();
+		Tree chain = new Tree(null);
+		boolean found = false;
 		for(File current : dirFiles) {
-			Tree chain = new Tree(null);
-			chain.setNode(current);
-			node.addNode(chain);
-			if(current.isDirectory()) {
-				Tree tmp = new Tree(current);
-				tmp.setParent(chain);
-				traversal(current,lex, type, tmp, root);
-				
-				root.addNode(node);
+			if(current.isDirectory()) {			
+				chain.setParent(node);
+				chain.setNode(current);
+				node.addNode(chain);
+				traversal(current,lex, type, chain);
 			}
 			else if(getFileExtension(current).equals(type)){
-				read(current.getAbsolutePath(), lex, chain);
+				boolean read = read(current.getAbsolutePath(), lex, chain);
+				if(read) {					
+					chain.setParent(node);
+					chain.setNode(current);
+					node.addNode(chain);
+					found = true;
+				}
+			}
+		}
+		if(!found) {
+			Tree parent = node.getParent();
+			if(parent != null) {
+				parent.remove(node);
 			}
 		}
 	}

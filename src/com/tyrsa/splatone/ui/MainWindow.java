@@ -3,6 +3,7 @@ package com.tyrsa.splatone.ui;
 import java.awt.EventQueue;
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -24,6 +25,7 @@ import javax.swing.tree.TreePath;
 import com.tyrsa.splatone.model.AsyncReader;
 import com.tyrsa.splatone.model.FileAsyncArrayList;
 import com.tyrsa.splatone.model.FileContainer;
+import com.tyrsa.splatone.model.Tree;
 import com.tyrsa.splatone.model.WriteToUIInterface;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -47,6 +49,42 @@ public class MainWindow extends JFrame {
 	private String initPath;
 	private JTextField inputtextField;
 	private JTextField typetextField;
+	private JTree tree;
+	
+	public void displayDirectoryContents(Tree dir,DefaultMutableTreeNode root2) throws InterruptedException 
+	{   
+	    DefaultMutableTreeNode newdir = new DefaultMutableTreeNode();   
+	    CopyOnWriteArrayList<Tree> files = dir.getLeaves();
+	    for (Tree file : files){
+	        if(file == null)
+	        {
+	            System.out.println("NUll directory found ");
+	            continue;
+	        }
+	        if (file.getNode().isDirectory())
+	        {
+	            if (file.getNode().listFiles()==null)
+	            {
+	                continue;
+	            }
+
+	            DefaultTreeModel model =(DefaultTreeModel) tree.getModel();
+	            DefaultMutableTreeNode root=(DefaultMutableTreeNode) model.getRoot();
+	            newdir = new DefaultMutableTreeNode(file.getNode().getName());
+	            root2.add(newdir);
+	            model.reload();
+	            displayDirectoryContents(file,newdir);
+	        }
+	        else
+	        {
+	            DefaultTreeModel model =(DefaultTreeModel) tree.getModel();
+	            DefaultMutableTreeNode selectednode = root2;
+	            DefaultMutableTreeNode newfile =new DefaultMutableTreeNode(file.getNode().getName());
+	            model.insertNodeInto(newfile, selectednode, selectednode.getChildCount());
+	            model.reload();
+	        }
+	    }    
+	}
 
 	/**
 	 * Launch the application.
@@ -89,7 +127,7 @@ public class MainWindow extends JFrame {
 		lblNewLabel.setBounds(12, 23, 167, 16);
 		desktopPane.add(lblNewLabel);
 		
-		JTree tree = new JTree();
+		tree = new JTree();
 		tree.setBorder(new LineBorder(new Color(0, 0, 0)));
 		tree.setModel(new DefaultTreeModel(
 			new DefaultMutableTreeNode("Root") {
@@ -134,24 +172,18 @@ public class MainWindow extends JFrame {
 				try {
 					String lex = inputtextField.getText();
 					String type = typetextField.getText();
-					AsyncReader.run(initPath,lex,type,(container) -> {
-						FileAsyncArrayList.getInstance().add(container);
+					AsyncReader.run(initPath,lex,type,(root) -> {
 						SwingUtilities.invokeLater(new Runnable() {
 							
 							@Override
 							public void run() {
-								DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
-							      DefaultMutableTreeNode root = (DefaultMutableTreeNode) tree.getModel()
-							          .getRoot();
-							      
-							      
-							      
-							      
-							      DefaultMutableTreeNode child = new DefaultMutableTreeNode(container.getFile());
-							      model.insertNodeInto(child, root, root.getChildCount());
-							      
-							      //tree.scrollPathToVisible(new TreePath(child.getPath()));
-								
+								DefaultTreeModel model =(DefaultTreeModel) tree.getModel();
+							    DefaultMutableTreeNode _root=(DefaultMutableTreeNode) model.getRoot();
+							    try {
+									displayDirectoryContents(root,_root);
+								} catch (InterruptedException e) {
+									JOptionPane.showMessageDialog(null, "Ошибка при визуализации дерева", "ОШИБКА", JOptionPane.ERROR_MESSAGE);
+								}
 								
 							}
 						});

@@ -1,42 +1,40 @@
 package com.tyrsa.splatone.ui;
 
+import java.awt.Color;
 import java.awt.EventQueue;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JDesktopPane;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import javax.swing.BoxLayout;
-import javax.swing.JDesktopPane;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-
-import java.awt.Color;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
+import javax.swing.filechooser.FileSystemView;
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
 import com.tyrsa.splatone.model.AsyncReader;
-import com.tyrsa.splatone.model.FileAsyncArrayList;
-import com.tyrsa.splatone.model.FileContainer;
 import com.tyrsa.splatone.model.Tree;
-import com.tyrsa.splatone.model.WriteToUIInterface;
-
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.JTextField;
-import javax.swing.JButton;
-import javax.swing.border.LineBorder;
-import javax.swing.filechooser.FileSystemView;
-import javax.swing.JTextArea;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import javax.swing.JTabbedPane;
 
 public class MainWindow extends JFrame {
 
@@ -47,9 +45,12 @@ public class MainWindow extends JFrame {
 	private JPanel contentPane;
 	private JTextField pathTextField;
 	private String initPath;
+	private String type;
 	private JTextField inputtextField;
 	private JTextField typetextField;
 	private JTree tree;
+	private JTabbedPane tabbedPane;
+	private Tree treeRoot;
 	
 	public void displayDirectoryContents(Tree dir,DefaultMutableTreeNode root2) throws InterruptedException 
 	{   
@@ -140,6 +141,27 @@ public class MainWindow extends JFrame {
 			}
 		));
 		tree.setBounds(12, 224, 359, 373);
+		tree.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent me) {
+				TreePath pathForLocation = tree.getPathForLocation(me.getX(), me.getY());
+				if(pathForLocation != null) {
+					Object[] path =  pathForLocation.getPath();
+					DefaultMutableTreeNode lastName = (DefaultMutableTreeNode) path[path.length - 1];
+					String lastFileName = (String) lastName.getUserObject();
+					if(lastFileName.contains(type)) {
+						List<String> list = new ArrayList<>();
+						for(Object obj : path) {
+							DefaultMutableTreeNode tmp = (DefaultMutableTreeNode) obj;
+							list.add((String) tmp.getUserObject());
+						}
+						list.remove(0);
+						Tree result = treeRoot.search(list);
+						tabbedPane.addTab(result.getNode().getName(), new CustomPane(result)); 
+						JOptionPane.showMessageDialog(null, "", "реяр", JOptionPane.OK_OPTION);
+					}
+				}
+			}
+		});
 		desktopPane.add(tree);
 		
 		pathTextField = new JTextField();
@@ -171,12 +193,13 @@ public class MainWindow extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
 					String lex = inputtextField.getText();
-					String type = typetextField.getText();
+					type = typetextField.getText();
 					AsyncReader.run(initPath,lex,type,(root) -> {
 						SwingUtilities.invokeLater(new Runnable() {
 							
 							@Override
 							public void run() {
+								treeRoot = root;
 								DefaultTreeModel model =(DefaultTreeModel) tree.getModel();
 							    DefaultMutableTreeNode _root=(DefaultMutableTreeNode) model.getRoot();
 							    try {
@@ -228,7 +251,7 @@ public class MainWindow extends JFrame {
 		typetextField.setBounds(12, 150, 256, 22);
 		desktopPane.add(typetextField);
 		
-		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		tabbedPane.setBounds(473, 42, 416, 517);
 		desktopPane.add(tabbedPane);
 		

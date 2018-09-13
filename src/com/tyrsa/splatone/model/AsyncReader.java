@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 
 public class AsyncReader {
 
-	public static boolean read(String path, String lex, Tree node) throws IOException, InterruptedException {
+	public static String read(String path, String lex, Tree node) throws IOException, InterruptedException {
 		ExecutorService pool = new ScheduledThreadPoolExecutor(3);
 	    AsynchronousFileChannel fileChannel = AsynchronousFileChannel.open(
 	    Paths.get(path), EnumSet.of(StandardOpenOption.READ),
@@ -53,9 +53,9 @@ public class AsyncReader {
 	    	chain.setText(result);
 	    	chain.setNode(new File(path));
 	    	node.addNode(chain);
-	    	return true;
+	    	return result;
 	    }
-	    return false;
+	    return null;
 	}
 	
 	public static void run(String path, String lex, String type, WriteToUIInterface out) throws IOException, InterruptedException {
@@ -84,10 +84,11 @@ public class AsyncReader {
 				traversal(current,lex, type, chain);
 			}
 			else if(getFileExtension(current).equals(type)){
-				boolean read = read(current.getAbsolutePath(), lex, chain);
-				if(read) {					
+				String read = read(current.getAbsolutePath(), lex, chain);
+				if(read != null) {					
 					chain.setParent(node);
 					chain.setNode(current);
+					chain.setText(read);
 					node.addNode(chain);
 					found = true;
 				}

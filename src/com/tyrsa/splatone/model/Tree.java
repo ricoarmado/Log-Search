@@ -1,6 +1,7 @@
 package com.tyrsa.splatone.model;
 
 import java.io.File;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Tree {
@@ -53,5 +54,24 @@ public class Tree {
 	
 	public void remove(Tree node) {
 		leaves.remove(node);
+	}
+	
+	public Tree search(List<String> nodes) {
+		String node = nodes.get(0);
+		Tree result = null;
+		for(Tree tree : leaves) {
+			if(tree.getNode().getName().equals(node)) {
+				nodes.remove(0);
+				if(nodes.size() == 0) {
+					result = tree;
+				}
+				else{
+					result = tree.search(nodes);
+				}
+				break;
+			}
+		}
+		return result;
+		
 	}
 }

@@ -20,20 +20,7 @@ public class CustomPane extends JScrollPane {
 	private String text;
 	
 	public CustomPane(Tree node, String lex) {
-		super(editor);
-		editor.addFocusListener(new FocusListener() {
-			
-			@Override
-			public void focusLost(FocusEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void focusGained(FocusEvent e) {
-				
-			}
-		});
+		
 		selectedIndex = 0;
 		text = node.getText();
 		String tmp = "<html><body>" + text + "</body></html>";
@@ -43,8 +30,20 @@ public class CustomPane extends JScrollPane {
 		this.node = node;
 		this.lex = lex;
 		editor.setText(text);
+		this.setViewportView(editor);
+		
+	} 
+	
+	public void update() {
+		editor = new JEditorPane();
+		String tmp = "<html><body>" + text + "</body></html>";
+		this.editor.setContentType("text/html");
+		this.editor.setText(tmp);
+		this.editor.setText(text);
+		this.setViewportView(editor);
+		this.repaint();
 	}
-
+	
 	public Tree getNode() {
 		return node;
 	}
@@ -56,7 +55,7 @@ public class CustomPane extends JScrollPane {
 	public void selectNext() {
 		if((selectedIndex + 1) <= countLexemes()) {
 			int foundLexemes = 0;
-			for (int i = 0; i < text.length() - lex.length(); i++) {
+			for (int i = 0; i < text.length() - lex.length() + 1; i++) {
 				if(text.substring(i, i + lex.length()).equals(lex)) {
 					if(foundLexemes != (selectedIndex)) {
 						foundLexemes++;

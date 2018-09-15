@@ -30,6 +30,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileSystemView;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -120,7 +122,7 @@ public class MainWindow extends JFrame {
 	
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 929, 698);
+		setBounds(100, 100, 1262, 884);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -146,7 +148,7 @@ public class MainWindow extends JFrame {
 				}
 			}
 		));
-		tree.setBounds(12, 224, 359, 373);
+		tree.setBounds(12, 224, 359, 590);
 		tree.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent me) {
 				TreePath pathForLocation = tree.getPathForLocation(me.getX(), me.getY());
@@ -171,7 +173,7 @@ public class MainWindow extends JFrame {
 							}
 						}
 						if(!found) {
-							tabbedPane.addTab(result.getNode().getName(), new CustomPane(result, lex));	
+							tabbedPane.addTab(result.getNode().getName(), new CustomPane(result, lex));							
 						}
 					}
 				}
@@ -249,7 +251,6 @@ public class MainWindow extends JFrame {
 		desktopPane.add(label_1);
 		
 		inputtextField = new JTextField();
-		inputtextField.setText("123");
 		inputtextField.setBounds(12, 99, 256, 22);
 		desktopPane.add(inputtextField);
 		inputtextField.setColumns(10);
@@ -263,19 +264,29 @@ public class MainWindow extends JFrame {
 		desktopPane.add(label_3);
 		
 		typetextField = new JTextField();
-		typetextField.setText(".txt");
+		typetextField.setText(".log");
 		typetextField.setColumns(10);
 		typetextField.setBounds(12, 150, 256, 22);
 		desktopPane.add(typetextField);
 		
 		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-		tabbedPane.setBounds(473, 42, 416, 517);
+		tabbedPane.setBounds(473, 42, 749, 734);
+		tabbedPane.addChangeListener(new ChangeListener() {
+			
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				CustomPane pane = (CustomPane) tabbedPane.getSelectedComponent();
+				tabbedPane.setSelectedComponent(pane);
+				pane.update();
+			}
+		});
 		desktopPane.add(tabbedPane);
 		
 		prevButton = new JButton("<<");
 		prevButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				Component tmp = tabbedPane.getSelectedComponent();
+				int index = tabbedPane.getSelectedIndex();
+				Component tmp = tabbedPane.getComponentAt(index);
 				if(tmp != null) {
 					CustomPane selectedPane = (CustomPane) tmp;
 					selectedPane.selectPrevious();
@@ -283,13 +294,14 @@ public class MainWindow extends JFrame {
 			}
 		});
 		prevButton.setEnabled(false);
-		prevButton.setBounds(473, 572, 97, 25);
+		prevButton.setBounds(473, 789, 167, 25);
 		desktopPane.add(prevButton);
 		
 		nextButton = new JButton(">>");
 		nextButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Component tmp = tabbedPane.getSelectedComponent();
+				int index = tabbedPane.getSelectedIndex();
+				Component tmp = tabbedPane.getComponentAt(index);
 				if(tmp != null) {
 					CustomPane selectedPane = (CustomPane) tmp;
 					selectedPane.selectNext();
@@ -298,13 +310,14 @@ public class MainWindow extends JFrame {
 			}
 		});
 		nextButton.setEnabled(false);
-		nextButton.setBounds(582, 572, 97, 25);
+		nextButton.setBounds(652, 789, 167, 25);
 		desktopPane.add(nextButton);
 		
 		selectallButton = new JButton("\u0412\u044B\u0431\u0440\u0430\u0442\u044C \u0432\u0441\u0435");
 		selectallButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Component tmp = tabbedPane.getSelectedComponent();
+				int index = tabbedPane.getSelectedIndex();
+				Component tmp = tabbedPane.getComponentAt(index);
 				if(tmp != null) {
 					CustomPane selectedPane = (CustomPane) tmp;
 					selectedPane.selectAll();
@@ -312,7 +325,7 @@ public class MainWindow extends JFrame {
 			}
 		});
 		selectallButton.setEnabled(false);
-		selectallButton.setBounds(691, 572, 198, 25);
+		selectallButton.setBounds(915, 789, 307, 25);
 		desktopPane.add(selectallButton);
 	}
 }

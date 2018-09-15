@@ -74,16 +74,18 @@ public class AsyncReader {
 	
 	public static void traversal(File currentDir, String lex, String type, Tree node) throws IOException, InterruptedException {
 		File[] dirFiles = currentDir.listFiles();
-		Tree chain = new Tree(null);
+		
 		boolean found = false;
 		for(File current : dirFiles) {
-			if(current.isDirectory()) {			
+			if(current.isDirectory()) {
+				Tree chain = new Tree(null);
 				chain.setParent(node);
 				chain.setNode(current);
 				node.addNode(chain);
 				traversal(current,lex, type, chain);
 			}
 			else if(getFileExtension(current).equals(type)){
+				Tree chain = new Tree(null);
 				String read = read(current.getAbsolutePath(), lex, chain);
 				if(read != null) {					
 					chain.setParent(node);

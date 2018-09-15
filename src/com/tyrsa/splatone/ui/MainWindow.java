@@ -1,6 +1,7 @@
 package com.tyrsa.splatone.ui;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -16,6 +17,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDesktopPane;
+import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -52,6 +54,9 @@ public class MainWindow extends JFrame {
 	private JTree tree;
 	private JTabbedPane tabbedPane;
 	private Tree treeRoot;
+	private JButton prevButton;
+	private JButton nextButton;
+	private JButton selectallButton;
 	
 	public void displayDirectoryContents(Tree dir,DefaultMutableTreeNode root2) throws InterruptedException 
 	{   
@@ -157,7 +162,17 @@ public class MainWindow extends JFrame {
 						}
 						list.remove(0);
 						Tree result = treeRoot.search(list);
-						tabbedPane.addTab(result.getNode().getName(), new CustomPane(result, lex)); 
+						boolean found = false;
+						for (int i = 0; i < tabbedPane.getTabCount(); i++) {
+							CustomPane childComponent = (CustomPane) tabbedPane.getComponentAt(i);
+							if(childComponent.getNode().equals(result)) {
+								found = true;
+								tabbedPane.setSelectedIndex(i);
+							}
+						}
+						if(!found) {
+							tabbedPane.addTab(result.getNode().getName(), new CustomPane(result, lex));	
+						}
 					}
 				}
 			}
@@ -207,7 +222,9 @@ public class MainWindow extends JFrame {
 								} catch (InterruptedException e) {
 									JOptionPane.showMessageDialog(null, "Ошибка при визуализации дерева", "ОШИБКА", JOptionPane.ERROR_MESSAGE);
 								}
-								
+							    prevButton.setEnabled(true);
+							    nextButton.setEnabled(true);
+							    selectallButton.setEnabled(true);
 							}
 						});
 					});
@@ -255,19 +272,47 @@ public class MainWindow extends JFrame {
 		tabbedPane.setBounds(473, 42, 416, 517);
 		desktopPane.add(tabbedPane);
 		
-		JButton button = new JButton("<<");
-		button.setEnabled(false);
-		button.setBounds(473, 572, 97, 25);
-		desktopPane.add(button);
+		prevButton = new JButton("<<");
+		prevButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				Component tmp = tabbedPane.getSelectedComponent();
+				if(tmp != null) {
+					CustomPane selectedPane = (CustomPane) tmp;
+					selectedPane.selectPrevious();
+				}
+			}
+		});
+		prevButton.setEnabled(false);
+		prevButton.setBounds(473, 572, 97, 25);
+		desktopPane.add(prevButton);
 		
-		JButton button_1 = new JButton(">>");
-		button_1.setEnabled(false);
-		button_1.setBounds(582, 572, 97, 25);
-		desktopPane.add(button_1);
+		nextButton = new JButton(">>");
+		nextButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Component tmp = tabbedPane.getSelectedComponent();
+				if(tmp != null) {
+					CustomPane selectedPane = (CustomPane) tmp;
+					selectedPane.selectNext();
+					
+				}
+			}
+		});
+		nextButton.setEnabled(false);
+		nextButton.setBounds(582, 572, 97, 25);
+		desktopPane.add(nextButton);
 		
-		JButton button_2 = new JButton("\u0412\u044B\u0431\u0440\u0430\u0442\u044C \u0432\u0441\u0435");
-		button_2.setEnabled(false);
-		button_2.setBounds(691, 572, 198, 25);
-		desktopPane.add(button_2);
+		selectallButton = new JButton("\u0412\u044B\u0431\u0440\u0430\u0442\u044C \u0432\u0441\u0435");
+		selectallButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Component tmp = tabbedPane.getSelectedComponent();
+				if(tmp != null) {
+					CustomPane selectedPane = (CustomPane) tmp;
+					selectedPane.selectAll();
+				}
+			}
+		});
+		selectallButton.setEnabled(false);
+		selectallButton.setBounds(691, 572, 198, 25);
+		desktopPane.add(selectallButton);
 	}
 }

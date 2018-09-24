@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousFileChannel;
 import java.nio.channels.CompletionHandler;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -15,14 +16,17 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 public class AsyncReader {
 	
 	public static String read(String path, String lex, Tree node) throws IOException, InterruptedException {
 		String result = "";
-		Path pathToFile = Paths.get(path);
-		List<String> allLines = Files.readAllLines(pathToFile);
+		Stream<String> lines = Files.lines(Paths.get(path), Charset.forName("windows-1251"));
+		List<String> allLines = lines.collect(Collectors.toList());
+		lines.close();
 		result = String.join("\n", allLines);
 		result.trim();
 	    if(result.contains(lex)) {

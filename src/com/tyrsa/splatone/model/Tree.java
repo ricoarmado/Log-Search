@@ -6,12 +6,28 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Tree {
 	
+	private Tree parent;
+	
+	private CopyOnWriteArrayList<Tree> leaves;
+
 	private File node;
 	
 	private String text;
 	
-	private Tree parent;
+	private int linesReadedEnd;
 	
+	private int linesReadedBegin;
+	
+	public Tree() {
+		linesReadedEnd = 0;
+		linesReadedBegin = 0;
+	}
+	
+	public Tree(File node) {
+		this.node = node;
+		leaves = new CopyOnWriteArrayList<>();
+		linesReadedEnd = 0;
+	}
 	
 	public Tree getParent() {
 		return parent;
@@ -20,14 +36,23 @@ public class Tree {
 	public void setParent(Tree parent) {
 		this.parent = parent;
 	}
-
-	private CopyOnWriteArrayList<Tree> leaves;
 	
-	public Tree(File node) {
-		this.node = node;
-		leaves = new CopyOnWriteArrayList<>();
+	public int getLinesReadedEnd() {
+		return linesReadedEnd;
+	}
+
+	public void setLinesReadedEnd(int linesReaded) {
+		this.linesReadedEnd = linesReaded;
 	}
 	
+	public int getLinesReadedBegin() {
+		return linesReadedBegin;
+	}
+
+	public void setLinesReadedBegin(int linesReadedBegin) {
+		this.linesReadedBegin = linesReadedBegin;
+	}
+
 	public void addNode(Tree node) {
 		leaves.addIfAbsent(node);
 	}

@@ -1,6 +1,8 @@
 package com.tyrsa.splatone.model;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousFileChannel;
@@ -13,6 +15,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -22,23 +25,24 @@ import java.util.stream.Stream;
 
 public class AsyncReader {
 	
-	public static String read(String path, String lex, Tree node) throws IOException, InterruptedException {
+	public static boolean read(String path, String lex, Tree node) throws IOException, InterruptedException {
 		String result = "";
-		Stream<String> lines = Files.lines(Paths.get(path), Charset.forName("windows-1251"));
-		List<String> allLines = lines.collect(Collectors.toList());
-		lines.close();
-		result = String.join("\n", allLines);
-		result.trim();
-	    if(result.contains(lex)) {
-	    	
-	    	
+		boolean found = false;
+		BufferedReader reader = new BufferedReader(new FileReader(new File(path)));
+		while((result = reader.readLine())!= null) {
+			if(result.contains(lex)) {
+				found = true;
+				break;
+			}
+		}
+		reader.close();
+	    if(found) {
 	    	Tree chain = new Tree(null);
-	    	chain.setText(result);
 	    	chain.setNode(new File(path));
 	    	node.addNode(chain);
-	    	return result;
+	    	return true;
 	    }
-		return null;
+		return false;
 	}
 
 	public static void run(String path, String lex, String type, WriteToUIInterface out) throws IOException, InterruptedException {
@@ -50,7 +54,7 @@ public class AsyncReader {
 		else {
 			Tree chain = new Tree(currentDir);
 			traversal(currentDir, lex, type, chain);
-			 root = chain;
+			root = chain;
 		}
 		out.write(root);
 	}
@@ -69,11 +73,10 @@ public class AsyncReader {
 			}
 			else if(getFileExtension(current).equals(type)){
 				Tree chain = new Tree(null);
-				String read = read(current.getAbsolutePath(), lex, chain);
-				if(read != null) {					
+				boolean read = read(current.getAbsolutePath(), lex, chain);
+				if(read) {					
 					chain.setParent(node);
 					chain.setNode(current);
-					chain.setText(read);
 					node.addNode(chain);
 					found = true;
 				}

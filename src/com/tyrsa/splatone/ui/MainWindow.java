@@ -173,7 +173,11 @@ public class MainWindow extends JFrame {
 							}
 						}
 						if(!found) {
-							tabbedPane.addTab(result.getNode().getName(), new CustomPane(result, lex));							
+							try {
+								tabbedPane.addTab(result.getNode().getName(), new CustomPane(result, lex));
+							} catch (Exception e) {
+								e.printStackTrace();
+							}							
 						}
 					}
 				}

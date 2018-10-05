@@ -33,6 +33,7 @@ import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileSystemView;
+import javax.swing.text.BadLocationException;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
@@ -122,7 +123,7 @@ public class MainWindow extends JFrame {
 	
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 1262, 884);
+		setBounds(0, 0, 1262, 800);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -148,7 +149,7 @@ public class MainWindow extends JFrame {
 				}
 			}
 		));
-		tree.setBounds(12, 224, 359, 590);
+		tree.setBounds(12, 224, 359, 490);
 		tree.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent me) {
 				TreePath pathForLocation = tree.getPathForLocation(me.getX(), me.getY());
@@ -274,7 +275,7 @@ public class MainWindow extends JFrame {
 		desktopPane.add(typetextField);
 		
 		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-		tabbedPane.setBounds(473, 42, 749, 734);
+		tabbedPane.setBounds(473, 42, 749, 634);
 		tabbedPane.addChangeListener(new ChangeListener() {
 			
 			@Override
@@ -298,7 +299,7 @@ public class MainWindow extends JFrame {
 			}
 		});
 		prevButton.setEnabled(false);
-		prevButton.setBounds(473, 789, 167, 25);
+		prevButton.setBounds(473, 689, 167, 25);
 		desktopPane.add(prevButton);
 		
 		nextButton = new JButton(">>");
@@ -308,13 +309,18 @@ public class MainWindow extends JFrame {
 				Component tmp = tabbedPane.getComponentAt(index);
 				if(tmp != null) {
 					CustomPane selectedPane = (CustomPane) tmp;
-					selectedPane.selectNext();
+					try {
+						selectedPane.selectNext();
+					} catch (BadLocationException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
 					
 				}
 			}
 		});
 		nextButton.setEnabled(false);
-		nextButton.setBounds(652, 789, 167, 25);
+		nextButton.setBounds(652, 689, 167, 25);
 		desktopPane.add(nextButton);
 		
 		selectallButton = new JButton("\u0412\u044B\u0431\u0440\u0430\u0442\u044C \u0432\u0441\u0435");
@@ -329,7 +335,7 @@ public class MainWindow extends JFrame {
 			}
 		});
 		selectallButton.setEnabled(false);
-		selectallButton.setBounds(915, 789, 307, 25);
+		selectallButton.setBounds(915, 689, 307, 25);
 		desktopPane.add(selectallButton);
 	}
 }

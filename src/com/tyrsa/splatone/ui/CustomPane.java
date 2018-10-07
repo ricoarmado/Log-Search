@@ -34,6 +34,7 @@ public class CustomPane extends JScrollPane {
 	private volatile int selectedIndex;
 	private String lex;
 	private String text;
+	private boolean start = false;
 	private volatile int startPoint = 0;
 	private volatile int endPoint = SIZE_OF_BLOCK;
 	private Document document;
@@ -101,19 +102,7 @@ public class CustomPane extends JScrollPane {
 	
 	public void selectAll() throws BadLocationException {
 		editor.requestFocus();
-		//editor.selectAll();
-//		Document document2 = editor.getDocument();
-//		Style def = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
-//	    Style s = document.addStyle("bold", def);
-//	    StyleConstants.setBold(s, true);
-//		for(int i = 0; i < document.getLength() - lex.length(); i++) {
-//			if(text.substring(i, i+lex.length()).equals(lex)) {
-//				int last = i + lex.length();
-//				String tmp = document.getText(i, last);
-//				document.remove(i, last);
-//				document.insertString(i, tmp, document.getStyle("bold"));
-//			}
-//		}
+		editor.selectAll();
 	    
 	}
 	public void selectNext() throws BadLocationException {
@@ -137,11 +126,12 @@ public class CustomPane extends JScrollPane {
 				}
 			}
 		}
-		else{  // если лексем больше нет,пробуем загрузить документ дальше
+		else {  // если лексем больше нет,пробуем загрузить документ дальше
 			boolean more = false;
 			try {
 				more = tryLoadNext();
 				if(more ) {
+					start = true;
 					selectNext();
 				}
 			} catch (Exception e) {
@@ -214,7 +204,7 @@ public class CustomPane extends JScrollPane {
 		else {
 			boolean more = false;
 			try {
-				if(startPoint != 0) {
+				if(startPoint != 0 && start) {
 					more = tryLoadPrev();
 					if(more) {
 						selectPrevious();

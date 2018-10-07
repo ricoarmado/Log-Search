@@ -42,6 +42,7 @@ public class CustomPane extends JScrollPane {
 		}
 		int startPoint = endPoint - SIZE_OF_BLOCK;
 		BufferedReader reader = new BufferedReader(new FileReader(file));
+		reader.skip(startPoint);
 		char [] c = new char[SIZE_OF_BLOCK];
 		reader.read(c);
 		result = new String(c).trim();
@@ -57,6 +58,7 @@ public class CustomPane extends JScrollPane {
 		int startPoint = node.getLinesReadedEnd();
 		int endPoint = startPoint + SIZE_OF_BLOCK;
 		BufferedReader reader = new BufferedReader(new FileReader(file));
+		reader.skip(startPoint);
 		char [] c = new char[1024];
 		int readChars;
 		readChars = reader.read(c);
@@ -100,9 +102,13 @@ public class CustomPane extends JScrollPane {
 		editor.selectAll();
 	}
 	public void selectNext() throws BadLocationException {
-		if((selectedIndex + 1) <= countLexemes(text)) { // Сверяем индекс текущей лексемы с общим кол-вом лексем
+		String text = editor.getText().replaceAll("\\n", "");
+		int num = countLexemes(text);
+		if(text.contains("stas")) {
+			System.out.println();
+		}
+		if((selectedIndex) < num) { // Сверяем индекс текущей лексемы с общим кол-вом лексем
 			int foundLexemes = 0;
-			String text = editor.getText().replaceAll("\\n", "");
 			for (int i = 0; i < text.length() - lex.length() + 1; i++) {
 				if(text.substring(i, i + lex.length()).equals(lex)) {
 					if(foundLexemes != (selectedIndex)) {
@@ -151,7 +157,7 @@ public class CustomPane extends JScrollPane {
 				length += string.length();
 				node.setLinesReadedBegin(node.getLinesReadedBegin() + SIZE_OF_BLOCK);
 				document.remove(0, length);
-				selectedIndex -= delLexemes;
+				//selectedIndex -= delLexemes;
 			}
 			return true;
 		}

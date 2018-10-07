@@ -1,9 +1,11 @@
 package com.tyrsa.splatone.model;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousFileChannel;
 import java.nio.channels.CompletionHandler;
@@ -28,7 +30,7 @@ public class AsyncReader {
 	public static boolean read(String path, String lex, Tree node) throws IOException, InterruptedException {
 		String result = "";
 		boolean found = false;
-		BufferedReader reader = new BufferedReader(new FileReader(new File(path)));
+		BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(path)),"cp1251"));
 		while((result = reader.readLine())!= null) {
 			if(result.contains(lex)) {
 				found = true;

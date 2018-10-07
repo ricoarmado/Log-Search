@@ -65,35 +65,40 @@ public class MainWindow extends JFrame {
 	{   
 	    DefaultMutableTreeNode newdir = new DefaultMutableTreeNode();   
 	    CopyOnWriteArrayList<Tree> files = dir.getLeaves();
-	    for (Tree file : files){
-	        if(file == null)
-	        {
-	            System.out.println("NUll directory found ");
-	            continue;
-	        }
-	        if (file.getNode().isDirectory())
-	        {
-	            if (file.getNode().listFiles()==null)
-	            {
-	                continue;
-	            }
+	    if(files.isEmpty()) {
+	    	JOptionPane.showMessageDialog(null, "Ничего не найдено", "Инфо", JOptionPane.OK_OPTION);
+	    }
+	    else{
+	    	for (Tree file : files){
+		        if(file == null)
+		        {
+		            System.out.println("NUll directory found ");
+		            continue;
+		        }
+		        if (file.getNode().isDirectory())
+		        {
+		            if (file.getNode().listFiles()==null)
+		            {
+		                continue;
+		            }
 
-	            DefaultTreeModel model =(DefaultTreeModel) tree.getModel();
-	            DefaultMutableTreeNode root=(DefaultMutableTreeNode) model.getRoot();
-	            newdir = new DefaultMutableTreeNode(file.getNode().getName());
-	            root2.add(newdir);
-	            model.reload();
-	            displayDirectoryContents(file,newdir);
-	        }
-	        else
-	        {
-	            DefaultTreeModel model =(DefaultTreeModel) tree.getModel();
-	            DefaultMutableTreeNode selectednode = root2;
-	            DefaultMutableTreeNode newfile =new DefaultMutableTreeNode(file.getNode().getName());
-	            model.insertNodeInto(newfile, selectednode, selectednode.getChildCount());
-	            model.reload();
-	        }
-	    }    
+		            DefaultTreeModel model =(DefaultTreeModel) tree.getModel();
+		            DefaultMutableTreeNode root=(DefaultMutableTreeNode) model.getRoot();
+		            newdir = new DefaultMutableTreeNode(file.getNode().getName());
+		            root2.add(newdir);
+		            model.reload();
+		            displayDirectoryContents(file,newdir);
+		        }
+		        else
+		        {
+		            DefaultTreeModel model =(DefaultTreeModel) tree.getModel();
+		            DefaultMutableTreeNode selectednode = root2;
+		            DefaultMutableTreeNode newfile =new DefaultMutableTreeNode(file.getNode().getName());
+		            model.insertNodeInto(newfile, selectednode, selectednode.getChildCount());
+		            model.reload();
+		        }
+		    }   
+	    }
 	}
 
 	/**
@@ -176,7 +181,10 @@ public class MainWindow extends JFrame {
 						if(!found) {
 							try {
 								tabbedPane.addTab(result.getNode().getName(), new CustomPane(result, lex));
+							} catch (NullPointerException e) {
+								System.out.println("Вы пытаетесь открыть несуществуюший файл");
 							} catch (Exception e) {
+								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}							
 						}
@@ -213,35 +221,40 @@ public class MainWindow extends JFrame {
 		JButton btnNewButton_1 = new JButton("\u0417\u0430\u043F\u0443\u0441\u043A");
 		btnNewButton_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				try {
-					lex = inputtextField.getText();
-					type = typetextField.getText();
-					AsyncReader.run(initPath,lex,type,(root) -> {
-						SwingUtilities.invokeLater(new Runnable() {
-							
-							@Override
-							public void run() {
-								treeRoot = root;
-								DefaultTreeModel model =(DefaultTreeModel) tree.getModel();
-							    DefaultMutableTreeNode _root=(DefaultMutableTreeNode) model.getRoot();
-							    try {
-									displayDirectoryContents(root,_root);
-								} catch (InterruptedException e) {
-									JOptionPane.showMessageDialog(null, "Ошибка при визуализации дерева", "ОШИБКА", JOptionPane.ERROR_MESSAGE);
+				new Thread(() -> {
+					try {
+						lex = inputtextField.getText();
+						type = typetextField.getText();
+						AsyncReader.run(initPath,lex,type,(root) -> {
+							SwingUtilities.invokeLater(new Runnable() {
+								
+								@Override
+								public void run() {
+									treeRoot = root;
+									DefaultTreeModel model =(DefaultTreeModel) tree.getModel();
+								    DefaultMutableTreeNode _root=(DefaultMutableTreeNode) model.getRoot();
+								    _root.removeAllChildren();
+								    try {
+										displayDirectoryContents(root,_root);
+									} catch (InterruptedException e) {
+										JOptionPane.showMessageDialog(null, "Ошибка при визуализации дерева", "ОШИБКА", JOptionPane.ERROR_MESSAGE);
+									}
+								    prevButton.setEnabled(true);
+								    nextButton.setEnabled(true);
+								    selectallButton.setEnabled(true);
 								}
-							    prevButton.setEnabled(true);
-							    nextButton.setEnabled(true);
-							    selectallButton.setEnabled(true);
-							}
+							});
 						});
-					});
-				} catch (IOException e) {
-					JOptionPane.showMessageDialog(null, "Ошибка при чтении файла", "ОШИБКА", JOptionPane.ERROR_MESSAGE);
-					e.printStackTrace();
-				} catch (InterruptedException e) {
-					JOptionPane.showMessageDialog(null, "Ошибка при работе с потоком", "ОШИБКА", JOptionPane.ERROR_MESSAGE);
-					e.printStackTrace();
-				}
+					} catch (IOException e) {
+						JOptionPane.showMessageDialog(null, "Ошибка при чтении файла", "ОШИБКА", JOptionPane.ERROR_MESSAGE);
+						e.printStackTrace();
+					} catch (InterruptedException e) {
+						JOptionPane.showMessageDialog(null, "Ошибка при работе с потоком", "ОШИБКА", JOptionPane.ERROR_MESSAGE);
+						e.printStackTrace();
+					}
+					
+				}).start();
+				
 			}
 		});
 		btnNewButton_1.setBounds(280, 98, 97, 25);
@@ -290,6 +303,10 @@ public class MainWindow extends JFrame {
 		prevButton = new JButton("<<");
 		prevButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				new Thread(() -> {
+					
+					
+				}).start();
 				int index = tabbedPane.getSelectedIndex();
 				Component tmp = tabbedPane.getComponentAt(index);
 				if(tmp != null) {
@@ -305,18 +322,21 @@ public class MainWindow extends JFrame {
 		nextButton = new JButton(">>");
 		nextButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				int index = tabbedPane.getSelectedIndex();
-				Component tmp = tabbedPane.getComponentAt(index);
-				if(tmp != null) {
-					CustomPane selectedPane = (CustomPane) tmp;
-					try {
-						selectedPane.selectNext();
-					} catch (BadLocationException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-					
-				}
+				new Thread(() -> {
+					int index = tabbedPane.getSelectedIndex();
+					Component tmp = tabbedPane.getComponentAt(index);
+					if(tmp != null) {
+						CustomPane selectedPane = (CustomPane) tmp;
+						try {
+							selectedPane.selectNext();
+						} catch (BadLocationException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+						
+					}					
+				}).start();
+
 			}
 		});
 		nextButton.setEnabled(false);

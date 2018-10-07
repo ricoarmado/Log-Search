@@ -14,9 +14,9 @@ public class Tree {
 	
 	private String text;
 	
-	private int linesReadedEnd;
+	private volatile int linesReadedEnd;
 	
-	private int linesReadedBegin;
+	private volatile int linesReadedBegin;
 	
 	public Tree() {
 		linesReadedEnd = 0;

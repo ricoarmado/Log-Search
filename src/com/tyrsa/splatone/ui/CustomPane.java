@@ -16,6 +16,10 @@ import javax.swing.JScrollPane;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyleContext;
+import javax.swing.text.StyledDocument;
 
 import com.tyrsa.splatone.model.Tree;
 
@@ -27,36 +31,35 @@ public class CustomPane extends JScrollPane {
 	private Tree node;
 	private static JEditorPane editor = new JEditorPane();
 	private JScrollPane scroll = new JScrollPane();
-	private int selectedIndex;
-	private int globalSelectedIndex;
+	private volatile int selectedIndex;
 	private String lex;
 	private String text;
+	private volatile int startPoint = 0;
+	private volatile int endPoint = SIZE_OF_BLOCK;
+	private Document document;
 	
-	private String readPrevBlock(Tree node) throws Exception{
+	private String readPrevBlock() throws Exception{
 		String result = "";
 		File file = node.getNode();
 		String read = "";
-		int endPoint = node.getLinesReadedBegin();
 		if(endPoint == 0) {
 			return "";
 		}
-		int startPoint = endPoint - SIZE_OF_BLOCK;
+		startPoint = endPoint - SIZE_OF_BLOCK;
+		endPoint = startPoint;
 		BufferedReader reader = new BufferedReader(new FileReader(file));
 		reader.skip(startPoint);
 		char [] c = new char[SIZE_OF_BLOCK];
 		reader.read(c);
 		result = new String(c).trim();
 		reader.close();
-		node.setLinesReadedBegin(startPoint);
 		return result;
 	}
 	
-	private String readNextBlock(Tree node) throws Exception {
+	private String readNextBlock() throws Exception {
 		String result ="";
 		File file = node.getNode();
 		String read = "";
-		int startPoint = node.getLinesReadedEnd();
-		int endPoint = startPoint + SIZE_OF_BLOCK;
 		BufferedReader reader = new BufferedReader(new FileReader(file));
 		reader.skip(startPoint);
 		char [] c = new char[1024];
@@ -64,18 +67,17 @@ public class CustomPane extends JScrollPane {
 		readChars = reader.read(c);
 		result = new String(c).trim();
 		reader.close();
-		node.setLinesReadedEnd(endPoint);
+		startPoint = endPoint;
+		endPoint = startPoint + SIZE_OF_BLOCK;
 		return result;
 	}
 	
 	public CustomPane(Tree node, String lex) throws Exception {
 		
 		selectedIndex = 0;
-		globalSelectedIndex = 0;
-		text = readNextBlock(node);
 		this.node = node;
 		this.lex = lex;
-		
+		text = readNextBlock();
 		Document document = editor.getDocument();
 		SimpleAttributeSet keyWord = new SimpleAttributeSet();
 		document.insertString(document.getLength(), text, keyWord);
@@ -97,16 +99,26 @@ public class CustomPane extends JScrollPane {
 		return node;
 	}
 	
-	public void selectAll() {
+	public void selectAll() throws BadLocationException {
 		editor.requestFocus();
-		editor.selectAll();
+		//editor.selectAll();
+//		Document document2 = editor.getDocument();
+//		Style def = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
+//	    Style s = document.addStyle("bold", def);
+//	    StyleConstants.setBold(s, true);
+//		for(int i = 0; i < document.getLength() - lex.length(); i++) {
+//			if(text.substring(i, i+lex.length()).equals(lex)) {
+//				int last = i + lex.length();
+//				String tmp = document.getText(i, last);
+//				document.remove(i, last);
+//				document.insertString(i, tmp, document.getStyle("bold"));
+//			}
+//		}
+	    
 	}
 	public void selectNext() throws BadLocationException {
 		String text = editor.getText().replaceAll("\\n", "");
 		int num = countLexemes(text);
-		if(text.contains("stas")) {
-			System.out.println();
-		}
 		if((selectedIndex) < num) { // Сверяем индекс текущей лексемы с общим кол-вом лексем
 			int foundLexemes = 0;
 			for (int i = 0; i < text.length() - lex.length() + 1; i++) {
@@ -120,7 +132,6 @@ public class CustomPane extends JScrollPane {
 						editor.setSelectionEnd(i + lex.length());
 						editor.setSelectedTextColor(Color.CYAN);
 						selectedIndex++;
-						globalSelectedIndex++;
 						break;
 					}
 				}
@@ -140,7 +151,7 @@ public class CustomPane extends JScrollPane {
 	}
 	
 	private boolean tryLoadNext() throws Exception {
-		String read = readNextBlock(node);
+		String read = readNextBlock();
 		if(!read.equals("")) {
 			text = text + read;
 			Document document = editor.getDocument();
@@ -148,16 +159,12 @@ public class CustomPane extends JScrollPane {
 			document.insertString(document.getLength(), read, keyWord);
 			if(document.getLength() > NUM_OF_SYNMOLS_ON_SCREEN) {
 				int length = 0;
-				int delLexemes = 0;
 				String string = text.substring(0, SIZE_OF_BLOCK);
 				text.replaceFirst(string, "");
-				if(string.contains(lex)) {
-					delLexemes++;
-				}
 				length += string.length();
 				node.setLinesReadedBegin(node.getLinesReadedBegin() + SIZE_OF_BLOCK);
 				document.remove(0, length);
-				//selectedIndex -= delLexemes;
+				selectedIndex -= countLexemes(string);
 			}
 			return true;
 		}
@@ -165,7 +172,7 @@ public class CustomPane extends JScrollPane {
 	}
 	
 	private boolean tryLoadPrev() throws Exception{
-		String read = readPrevBlock(node);
+		String read = readPrevBlock();
 		if(!read.equals("")) {
 			Document document = editor.getDocument();
 			SimpleAttributeSet keyWord = new SimpleAttributeSet();
@@ -185,9 +192,7 @@ public class CustomPane extends JScrollPane {
 	}
 
 	public void selectPrevious() {
-		if((selectedIndex ) > 1) {
-			selectedIndex--;
-			globalSelectedIndex--;
+		if((selectedIndex ) > 0) {
 			int foundLexemes = 0;
 			String text = editor.getText().replaceAll("\\n", "");
 			for (int i = 0; i < text.length() - lex.length(); i++) {
@@ -200,6 +205,7 @@ public class CustomPane extends JScrollPane {
 						editor.setSelectionStart(i);
 						editor.setSelectionEnd(i + lex.length());
 						editor.setSelectedTextColor(Color.CYAN);
+						selectedIndex--;
 						break;
 					}
 				}
@@ -208,7 +214,7 @@ public class CustomPane extends JScrollPane {
 		else {
 			boolean more = false;
 			try {
-				if(globalSelectedIndex > 1) {
+				if(startPoint != 0) {
 					more = tryLoadPrev();
 					if(more) {
 						selectPrevious();

@@ -234,6 +234,9 @@ public class MainWindow extends JFrame {
 									DefaultTreeModel model =(DefaultTreeModel) tree.getModel();
 								    DefaultMutableTreeNode _root=(DefaultMutableTreeNode) model.getRoot();
 								    _root.removeAllChildren();
+								    while(tabbedPane.getTabCount() > 0) {
+								    	tabbedPane.remove(0);
+								    }
 								    try {
 										displayDirectoryContents(root,_root);
 									} catch (InterruptedException e) {
@@ -346,11 +349,15 @@ public class MainWindow extends JFrame {
 		selectallButton = new JButton("\u0412\u044B\u0431\u0440\u0430\u0442\u044C \u0432\u0441\u0435");
 		selectallButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				int index = tabbedPane.getSelectedIndex();
-				Component tmp = tabbedPane.getComponentAt(index);
-				if(tmp != null) {
-					CustomPane selectedPane = (CustomPane) tmp;
-					selectedPane.selectAll();
+				try {
+					int index = tabbedPane.getSelectedIndex();
+					Component tmp = tabbedPane.getComponentAt(index);
+					if(tmp != null) {
+						CustomPane selectedPane = (CustomPane) tmp;
+						selectedPane.selectAll();
+					}	
+				}catch(Exception ex) {
+					System.err.println(ex.getMessage());
 				}
 			}
 		});
